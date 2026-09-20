@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Hello {
 
-	@GetMapping("/")
+	@GetMapping("/api/health")
 	public String hello() {
-		return "Hello World! CI pipeline test is working";
+		return "Ojal's birthday site is running";
 	}
 }
