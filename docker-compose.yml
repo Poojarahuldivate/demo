@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: demo-app
+    ports:
+      - "8080:8080"
+
+  app-2:
+    build:
+      context: .
+    container_name: demo-app-2
+    ports:
+      - "8081:8080"
