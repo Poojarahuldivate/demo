@@ -74,6 +74,36 @@ const navLinks = document.querySelector('.nav-links');
 menuToggle.addEventListener('click', () => { const open = navLinks.classList.toggle('open'); menuToggle.setAttribute('aria-expanded', open); });
 navLinks.addEventListener('click', event => { if (event.target.tagName === 'A') { navLinks.classList.remove('open'); menuToggle.setAttribute('aria-expanded', 'false'); } });
 
+const rsvpForm = document.querySelector('#rsvp-form');
+const rsvpStatus = document.querySelector('#rsvp-status');
+const attendingCount = document.querySelector('#attending-count');
+async function loadAttendingCount() {
+  try {
+    const response = await fetch('/api/rsvps/count');
+    if (!response.ok) throw new Error('Count unavailable');
+    attendingCount.textContent = (await response.json()).attending;
+  } catch (error) {
+    attendingCount.textContent = '♡';
+  }
+}
+rsvpForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const formData = new FormData(rsvpForm);
+  const payload = { name: formData.get('name'), attending: formData.get('attending') === 'true', guests: Number(formData.get('guests')), message: formData.get('message') };
+  rsvpStatus.textContent = 'Saving your RSVP...';
+  try {
+    const response = await fetch('/api/rsvps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Could not save RSVP');
+    rsvpStatus.textContent = result.message;
+    rsvpForm.reset();
+    loadAttendingCount();
+  } catch (error) {
+    rsvpStatus.textContent = 'RSVP is available when the Spring Boot backend is running locally.';
+  }
+});
+loadAttendingCount();
+
 document.querySelector('#wish-button').addEventListener('click', event => {
   document.querySelector('#wish-message').textContent = 'Make a wish, Ojal! ✨';
   event.currentTarget.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 500 });
